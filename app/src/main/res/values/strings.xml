@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">CV_OCR</string>
+    <string name="todo">todo</string>
+    <string name="button">OCR</string>
+    <string name="button1">CHOOSE</string>
+    <string name="button2">PROCESS</string>
+</resources>
