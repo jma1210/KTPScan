@@ -1,5 +1,6 @@
 package com.example.cv_ocr;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -14,6 +15,14 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
+
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+import com.google.mlkit.vision.common.InputImage;
+import com.google.mlkit.vision.text.Text;
+import com.google.mlkit.vision.text.TextRecognition;
+import com.google.mlkit.vision.text.TextRecognizer;
 
 import org.opencv.android.BaseLoaderCallback;
 import org.opencv.android.LoaderCallbackInterface;
@@ -40,7 +49,7 @@ public class MainActivity extends AppCompatActivity {
     Button b1, b2, b3;
     ImageView iv;
     Uri imguri;
-
+    Bitmap forOcr;
     private void openGallery() {
         Intent gallery = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.INTERNAL_CONTENT_URI);
         startActivityForResult(gallery, PICK_IMAGE);
@@ -80,8 +89,51 @@ public class MainActivity extends AppCompatActivity {
                         imageProcess();
                     }
             });
+        b3.setOnClickListener(new View.OnClickListener()
+            {
+                @Override
+                public void onClick(View v)
+                    {
+                        charRecognition();
+                    }
+            });
     };
+    public void charRecognition()
+        {
+            if(forOcr == null)
+            {
+                Toast toast = Toast.makeText(getApplicationContext(),"No picture available for transform", Toast.LENGTH_LONG);
+                toast.show();
+                return;
+            }
+            InputImage img = InputImage.fromBitmap(forOcr,0);
+            TextRecognizer recognizer = TextRecognition.getClient();
+            Task<Text> result =
+                recognizer.process(img)
+                    .addOnSuccessListener(new OnSuccessListener<Text>() {
+                        @Override
+                        public void onSuccess(Text text) {
+                            processText(text);
+                        }
+                    })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            e.printStackTrace();
+                        }
+                    });
 
+        };
+    private void processText(Text text)
+        {
+            List<Text.TextBlock> blocks = text.getTextBlocks();
+            if(blocks.size() == 0)
+                {
+                    Toast toast = Toast.makeText(getApplicationContext(),"No text available for OCR", Toast.LENGTH_LONG);
+                    toast.show();
+                    return;
+                }
+        }
     public void imageProcess()
         {
             Mat org = new Mat();
@@ -132,6 +184,7 @@ public class MainActivity extends AppCompatActivity {
                 Bitmap bm = Bitmap.createBitmap(dstImage.cols(),dstImage.rows(), Bitmap.Config.ARGB_8888);
                 Utils.matToBitmap(dstImage,bm);
                 iv.setImageBitmap(bm);
+                forOcr = bm.copy(bm.getConfig(),false);
             }
             else
             {
