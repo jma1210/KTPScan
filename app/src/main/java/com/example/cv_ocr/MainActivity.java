@@ -133,6 +133,14 @@ public class MainActivity extends AppCompatActivity {
                     toast.show();
                     return;
                 }
+            for(int i = 0 ; i < blocks.size() ; ++i)
+                {
+                    List<Text.Line> lines = blocks.get(i).getLines();
+                    for(int j = 0 ; j < lines.size() ; ++j)
+                        {
+
+                        }
+                }
         }
     public void imageProcess()
         {
