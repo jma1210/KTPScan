@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Matrix;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -40,16 +41,20 @@ import org.opencv.imgproc.Imgproc;
 import org.opencv.imgproc.Moments;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
     private boolean isOCVSetUp = false;
     public static final String TAG = "DEBUG";
     private static final int PICK_IMAGE = 100;
+    String nama, provinsi, NIK;
     Button b1, b2, b3;
     ImageView iv;
     Uri imguri;
     Bitmap forOcr;
+    StringUtil checks;
+
     private void openGallery() {
         Intent gallery = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.INTERNAL_CONTENT_URI);
         startActivityForResult(gallery, PICK_IMAGE);
@@ -100,29 +105,38 @@ public class MainActivity extends AppCompatActivity {
     };
     public void charRecognition()
         {
+
             if(forOcr == null)
             {
-                Toast toast = Toast.makeText(getApplicationContext(),"No picture available for transform", Toast.LENGTH_LONG);
+                Toast toast = Toast.makeText(getApplicationContext(),"No picture available for OCR", Toast.LENGTH_LONG);
                 toast.show();
                 return;
             }
-            InputImage img = InputImage.fromBitmap(forOcr,0);
-            TextRecognizer recognizer = TextRecognition.getClient();
-            Task<Text> result =
-                recognizer.process(img)
-                    .addOnSuccessListener(new OnSuccessListener<Text>() {
-                        @Override
-                        public void onSuccess(Text text) {
-                            processText(text);
-                        }
-                    })
-                    .addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception e) {
-                            e.printStackTrace();
-                        }
-                    });
+            else
+            {
+                InputImage img = InputImage.fromBitmap(forOcr, 0);
+                TextRecognizer recognizer = TextRecognition.getClient();
+                Task<Text> result =
+                        recognizer.process(img)
+                                .addOnSuccessListener(new OnSuccessListener<Text>() {
+                                    @Override
+                                    public void onSuccess(Text text) {
+                                        processText(text);
+                                    }
+                                })
+                                .addOnFailureListener(new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception e) {
+                                        e.printStackTrace();
+                                    }
+                                });
+            }
+        };
+    private Bitmap deskew(Bitmap input)
+        {
+            Matrix mat = new Matrix();
 
+            return null;
         };
     private void processText(Text text)
         {
@@ -135,11 +149,9 @@ public class MainActivity extends AppCompatActivity {
                 }
             for(int i = 0 ; i < blocks.size() ; ++i)
                 {
-                    List<Text.Line> lines = blocks.get(i).getLines();
-                    for(int j = 0 ; j < lines.size() ; ++j)
-                        {
 
-                        }
+                    Log.i("Block "+String.valueOf(i),blocks.get(i).getText());
+                    Log.i("Block "+String.valueOf(i)+" Location", Arrays.toString(blocks.get(i).getCornerPoints()));
                 }
         }
     public void imageProcess()
@@ -163,7 +175,6 @@ public class MainActivity extends AppCompatActivity {
                     Log.e("ERROR OCCURED",String.valueOf(e));
                 }
             //Resizing images for faster calculations
-//            Imgproc.cvtColor(org,org,Imgproc.COLOR_BGR2RGB);
             Mat src = new Mat();
             Double ratio = 800.0/org.rows();
             Double newWidth = org.cols()*ratio;
@@ -222,6 +233,7 @@ public class MainActivity extends AppCompatActivity {
                 {
                     if(pixel > maxLap)maxLap=pixel;
                 }
+            Log.i("maxLap of image is : ",String.valueOf(maxLap));
             return maxLap<= -4000000;
         };
 
