@@ -6,7 +6,7 @@ public class StringUtil {
     public boolean checkIfCaps(String check)
         {
             for(int i = 0 ; i < check.length() ; ++i)
-                if(check.codePointAt(i)<65 || check.codePointAt(i)>90)
+                if(!(check.codePointAt(i)>=65 && check.codePointAt(i)<=90)&&check.codePointAt(i)!=32)
                     return false;
             return true;
         }
