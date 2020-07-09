@@ -49,12 +49,11 @@ public class MainActivity extends AppCompatActivity {
     private boolean isOCVSetUp = false;
     public static final String TAG = "DEBUG";
     private static final int PICK_IMAGE = 100;
-    KTPFields ktp;
+    KTPFields ktp = new KTPFields();
     Button b1, b2, b3;
     ImageView iv;
     Uri imguri;
     Bitmap forOcr;
-    StringUtil checks;
 
     private void openGallery() {
         Intent gallery = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.INTERNAL_CONTENT_URI);
@@ -137,7 +136,7 @@ public class MainActivity extends AppCompatActivity {
     private void processText(Text text)
         {
             List<Text.TextBlock> blocks = text.getTextBlocks();
-            List<Text.Line> sumLines = new ArrayList<Text.Line>();
+            List<String> sumLines = new ArrayList<String>();
             if(blocks.size() == 0)
                 {
                     Toast toast = Toast.makeText(getApplicationContext(),"No text available for OCR", Toast.LENGTH_LONG);
@@ -150,10 +149,10 @@ public class MainActivity extends AppCompatActivity {
                     List<Text.Line> lines = blocks.get(i).getLines();
                     for(int j = 0 ; j < lines.size() ; ++j)
                         {
-                            sumLines.add(lines.get(j));
+                            sumLines.add(lines.get(j).getText());
                         }
                 }
-            ktp.inputFields(sumLines);
+            if(!sumLines.isEmpty()){ktp.inputFields(sumLines);}
         };
     public void imageProcess()
         {
