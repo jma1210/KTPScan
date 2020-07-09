@@ -21,4 +21,10 @@ public class StringUtil {
             }
             return false;
         }
+    public boolean checkAllNum(String check)
+        {
+            for(int i = 0 ; i<check.length() ; ++i)if(check.codePointAt(i)<48 || check.codePointAt(i)>57)
+                return false;
+            return true;
+        }
 }

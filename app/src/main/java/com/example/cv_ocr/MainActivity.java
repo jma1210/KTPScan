@@ -32,6 +32,7 @@ import org.opencv.android.Utils;
 import org.opencv.core.Core;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
+import org.opencv.core.MatOfDouble;
 import org.opencv.core.MatOfPoint;
 import org.opencv.core.MatOfPoint2f;
 import org.opencv.core.Point;
@@ -48,7 +49,7 @@ public class MainActivity extends AppCompatActivity {
     private boolean isOCVSetUp = false;
     public static final String TAG = "DEBUG";
     private static final int PICK_IMAGE = 100;
-    String nama, provinsi, NIK;
+    KTPFields ktp;
     Button b1, b2, b3;
     ImageView iv;
     Uri imguri;
@@ -132,15 +133,11 @@ public class MainActivity extends AppCompatActivity {
                                 });
             }
         };
-    private Bitmap deskew(Bitmap input)
-        {
-            Matrix mat = new Matrix();
 
-            return null;
-        };
     private void processText(Text text)
         {
             List<Text.TextBlock> blocks = text.getTextBlocks();
+            List<Text.Line> sumLines = new ArrayList<Text.Line>();
             if(blocks.size() == 0)
                 {
                     Toast toast = Toast.makeText(getApplicationContext(),"No text available for OCR", Toast.LENGTH_LONG);
@@ -149,11 +146,15 @@ public class MainActivity extends AppCompatActivity {
                 }
             for(int i = 0 ; i < blocks.size() ; ++i)
                 {
-
-                    Log.i("Block "+String.valueOf(i),blocks.get(i).getText());
-                    Log.i("Block "+String.valueOf(i)+" Location", Arrays.toString(blocks.get(i).getCornerPoints()));
+                    Log.i("Blocks "+String.valueOf(i),blocks.get(i).getText());
+                    List<Text.Line> lines = blocks.get(i).getLines();
+                    for(int j = 0 ; j < lines.size() ; ++j)
+                        {
+                            sumLines.add(lines.get(j));
+                        }
                 }
-        }
+            ktp.inputFields(sumLines);
+        };
     public void imageProcess()
         {
             Mat org = new Mat();
@@ -202,8 +203,10 @@ public class MainActivity extends AppCompatActivity {
             {
                 Bitmap bm = Bitmap.createBitmap(dstImage.cols(),dstImage.rows(), Bitmap.Config.ARGB_8888);
                 Utils.matToBitmap(dstImage,bm);
+                if(bm.getWidth()<bm.getHeight())bm = rotate(bm,90);
                 iv.setImageBitmap(bm);
                 forOcr = bm.copy(bm.getConfig(),false);
+
             }
             else
             {
@@ -215,26 +218,25 @@ public class MainActivity extends AppCompatActivity {
 
         };
 
+    private Bitmap rotate(Bitmap source,float angle)
+    {
+        Matrix mat = new Matrix();
+        mat.postRotate(angle);
+        return Bitmap.createBitmap(source, 0, 0, source.getWidth(), source.getHeight(), mat, true);
+    };
     private boolean getBlur(Mat src)
         {
-            Mat laplacian = new Mat();
+            double score = 0.0;
+            Mat dst = new Mat();
             Mat matGray = new Mat();
-            Mat laplacian8bit = new Mat();
-            Imgproc.cvtColor(src,matGray,Imgproc.COLOR_RGB2GRAY);
-            Imgproc.Laplacian(matGray,laplacian,CvType.CV_8U);
-            laplacian.convertTo(laplacian8bit,CvType.CV_8UC1);
-
-            Bitmap bmp = Bitmap.createBitmap(laplacian8bit.cols(),laplacian8bit.rows(),Bitmap.Config.ARGB_8888);
-            int[] pixels = new int[bmp.getWidth()*bmp.getHeight()];
-            bmp.getPixels(pixels,0,bmp.getWidth(),0,0,bmp.getWidth(),bmp.getHeight());
-
-            int maxLap = -16777216;
-            for(int pixel : pixels)
-                {
-                    if(pixel > maxLap)maxLap=pixel;
-                }
-            Log.i("maxLap of image is : ",String.valueOf(maxLap));
-            return maxLap<= -4000000;
+            Imgproc.cvtColor(src,matGray,Imgproc.COLOR_BGR2GRAY);
+            Imgproc.Laplacian(matGray,dst,3);
+            MatOfDouble median = new MatOfDouble();
+            MatOfDouble std = new MatOfDouble();
+            Core.meanStdDev(dst,median,std);
+            score = Math.pow(std.get(0,0)[0],2);
+            Log.i("Score",String.valueOf(score));
+            return score<500;
         };
 
     private void perspTransform(Mat src, Mat dst, Mat mask, double ratio)
