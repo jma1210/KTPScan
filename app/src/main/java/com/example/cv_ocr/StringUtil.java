@@ -21,10 +21,25 @@ public class StringUtil {
             }
             return false;
         }
-    public boolean checkAllNum(String check)
+    public boolean containsNum(String check)
         {
-            for(int i = 0 ; i<check.length() ; ++i)if(check.codePointAt(i)<48 || check.codePointAt(i)>57)
-                return false;
-            return true;
+            boolean returnable = false;
+            for(int i = 0 ; i<check.length() ; ++i)
+                if(check.codePointAt(i)>=48 && check.codePointAt(i)<=57)
+                {
+                    returnable = true;
+                    break;
+                }
+            return returnable;
         }
+    public int nthLastIndex(int nth, String ch, String string)
+        {
+            if(nth <= 0) return string.length();
+            return nthLastIndex(--nth,ch,string.substring(0,string.lastIndexOf(ch)));
+        }
+    public String rmnonAlphaNum(String toClean)
+        {
+            return toClean.replaceAll("[^a-zA-Z0-9]", "");
+        }
+
 }

@@ -33,6 +33,7 @@ import org.opencv.core.Core;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfDouble;
+import org.opencv.core.MatOfInt;
 import org.opencv.core.MatOfPoint;
 import org.opencv.core.MatOfPoint2f;
 import org.opencv.core.Point;
@@ -49,7 +50,7 @@ public class MainActivity extends AppCompatActivity {
     private boolean isOCVSetUp = false;
     public static final String TAG = "DEBUG";
     private static final int PICK_IMAGE = 100;
-    KTPFields ktp = new KTPFields();
+    KTPFields ktp;
     Button b1, b2, b3;
     ImageView iv;
     Uri imguri;
@@ -105,7 +106,7 @@ public class MainActivity extends AppCompatActivity {
     };
     public void charRecognition()
         {
-
+            ktp = new KTPFields();
             if(forOcr == null)
             {
                 Toast toast = Toast.makeText(getApplicationContext(),"No picture available for OCR", Toast.LENGTH_LONG);
@@ -145,11 +146,11 @@ public class MainActivity extends AppCompatActivity {
                 }
             for(int i = 0 ; i < blocks.size() ; ++i)
                 {
-                    Log.i("Blocks "+String.valueOf(i),blocks.get(i).getText());
                     List<Text.Line> lines = blocks.get(i).getLines();
                     for(int j = 0 ; j < lines.size() ; ++j)
                         {
                             sumLines.add(lines.get(j).getText());
+                            Log.i("Line "+String.valueOf(i)+","+String.valueOf(j),lines.get(j).getText());
                         }
                 }
             if(!sumLines.isEmpty()){ktp.inputFields(sumLines);}
@@ -311,10 +312,13 @@ public class MainActivity extends AppCompatActivity {
                             new Point(actWidth-1,actHeight-1),
                             new Point(0,actHeight-1)
                     );
+
             Mat warpMat = Imgproc.getPerspectiveTransform(orgCoords,finCoords);
             Size dsize = new Size(actWidth,actHeight);
             Imgproc.warpPerspective(src,dst,warpMat,dsize,Imgproc.INTER_LINEAR,Core.BORDER_CONSTANT);
+            Core.normalize(dst,dst,0,255,Core.NORM_MINMAX,CvType.CV_8UC3);
         }
+
     private BaseLoaderCallback mLoaderCallback = new BaseLoaderCallback(this) {
         @RequiresApi(api = Build.VERSION_CODES.N)
         @Override
