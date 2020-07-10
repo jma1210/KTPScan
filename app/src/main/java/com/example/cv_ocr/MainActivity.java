@@ -15,6 +15,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnFailureListener;
@@ -33,7 +34,6 @@ import org.opencv.core.Core;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfDouble;
-import org.opencv.core.MatOfInt;
 import org.opencv.core.MatOfPoint;
 import org.opencv.core.MatOfPoint2f;
 import org.opencv.core.Point;
@@ -43,7 +43,6 @@ import org.opencv.imgproc.Imgproc;
 import org.opencv.imgproc.Moments;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
@@ -53,10 +52,12 @@ public class MainActivity extends AppCompatActivity {
     KTPFields ktp;
     Button b1, b2, b3;
     ImageView iv;
+    TextView tv;
     Uri imguri;
     Bitmap forOcr;
 
     private void openGallery() {
+        tv.setText("");
         Intent gallery = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.INTERNAL_CONTENT_URI);
         startActivityForResult(gallery, PICK_IMAGE);
     }
@@ -79,6 +80,7 @@ public class MainActivity extends AppCompatActivity {
         b2 = (Button) findViewById(R.id.button8);
         b3 = (Button) findViewById(R.id.button9);
         iv = (ImageView)findViewById(R.id.imageView);
+        tv = (TextView)findViewById(R.id.textView);
         b1.setOnClickListener(new View.OnClickListener()
             {
                 @Override
@@ -123,6 +125,9 @@ public class MainActivity extends AppCompatActivity {
                                     @Override
                                     public void onSuccess(Text text) {
                                         processText(text);
+                                        tv.setText(ktp.toPrint);
+                                        Toast toast = Toast.makeText(getApplicationContext(),"Finished doing OCR", Toast.LENGTH_LONG);
+                                        toast.show();
                                     }
                                 })
                                 .addOnFailureListener(new OnFailureListener() {
@@ -157,6 +162,7 @@ public class MainActivity extends AppCompatActivity {
         };
     public void imageProcess()
         {
+            tv.setText("");
             Mat org = new Mat();
             if(imguri == null)
                 {
@@ -316,8 +322,7 @@ public class MainActivity extends AppCompatActivity {
             Mat warpMat = Imgproc.getPerspectiveTransform(orgCoords,finCoords);
             Size dsize = new Size(actWidth,actHeight);
             Imgproc.warpPerspective(src,dst,warpMat,dsize,Imgproc.INTER_LINEAR,Core.BORDER_CONSTANT);
-            Core.normalize(dst,dst,0,255,Core.NORM_MINMAX,CvType.CV_8UC3);
-            Imgproc.cvtColor(dst,dst,Imgproc.COLOR_BGR2GRAY);
+            Core.normalize(dst,dst,0,350,Core.NORM_MINMAX,CvType.CV_8UC3);
 
         }
 

@@ -9,6 +9,7 @@ import java.util.List;
 public class KTPFields {
     String[] infoFields = new String[9];
     boolean[] infoBools = new boolean[9];
+    String toPrint = "";
     /*
     Nama = 0
     NIK = 1
@@ -64,19 +65,18 @@ public class KTPFields {
                                     insertData(7,toCheck.substring(toCheck.indexOf(" ",0)).trim());
                                     continue;
                                 }
-                            if(toCheck.contains("Kecam")&& !infoBools[8])
-                                {
-                                    if(toCheck.indexOf(" ")==-1)
-                                        insertData(8, toCheck);
-                                    else
-                                        insertData(8,toCheck.substring(toCheck.indexOf(" ")).trim());
-                                    continue;
-                                }
+                            if(toCheck.contains("Kecam")&& !infoBools[8]) {
+                                if (toCheck.indexOf(" ") == -1)
+                                    insertData(8, toCheck);
+                                else
+                                    insertData(8, toCheck.substring(toCheck.indexOf(" ")).trim());
+                                continue;
+                            }
                         }
-                    for(int i = 0; i < infoFields.length ; ++i)
-                        {
-                            if(infoBools[i])Log.i("Info field ["+String.valueOf(i)+"]",infoFields[i]);
-                        }
+                    for(int i = 0 ; i<infoBools.length;++i)
+                    {
+                        if(infoBools[i])toPrint+=infoFields[i]+'\n';
+                    }
                 };
 
             public void insertData(int dataIndex, String inputData)

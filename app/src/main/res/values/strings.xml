@@ -4,4 +4,5 @@
     <string name="button">OCR</string>
     <string name="button1">CHOOSE</string>
     <string name="button2">PROCESS</string>
+    <string name="textview" />
 </resources>
