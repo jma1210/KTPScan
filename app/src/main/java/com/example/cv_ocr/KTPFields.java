@@ -51,8 +51,8 @@ public class KTPFields {
                             if(toCheck.contains("-") && !infoBools[4])
                                 {
                                     insertData(4,toCheck.substring(toCheck.length()-10));
-                                    String mod = toCheck.substring(checks.nthLastIndex(2," ",toCheck),checks.nthLastIndex(1," ",toCheck));
-                                    insertData(5, checks.rmnonAlphaNum(mod));
+                                    String mod = toCheck.substring(0,toCheck.length()-10);
+                                    insertData(5, checks.rmnonAlphaNum(mod.substring(mod.indexOf("r")+1)));
                                     continue;
                                 }
                             if(toCheck.contains("Status") && !infoBools[6])

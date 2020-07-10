@@ -32,11 +32,7 @@ public class StringUtil {
                 }
             return returnable;
         }
-    public int nthLastIndex(int nth, String ch, String string)
-        {
-            if(nth <= 0) return string.length();
-            return nthLastIndex(--nth,ch,string.substring(0,string.lastIndexOf(ch)));
-        }
+
     public String rmnonAlphaNum(String toClean)
         {
             return toClean.replaceAll("[^a-zA-Z0-9]", "");

@@ -126,8 +126,6 @@ public class MainActivity extends AppCompatActivity {
                                     public void onSuccess(Text text) {
                                         processText(text);
                                         tv.setText(ktp.toPrint);
-                                        Toast toast = Toast.makeText(getApplicationContext(),"Finished doing OCR", Toast.LENGTH_LONG);
-                                        toast.show();
                                     }
                                 })
                                 .addOnFailureListener(new OnFailureListener() {
@@ -159,6 +157,13 @@ public class MainActivity extends AppCompatActivity {
                         }
                 }
             if(!sumLines.isEmpty()){ktp.inputFields(sumLines);}
+            if(!ktp.toPrint.isEmpty())
+            {Toast toast = Toast.makeText(getApplicationContext(),"Finished doing OCR", Toast.LENGTH_LONG);
+            toast.show();}
+            else {
+                Toast toast = Toast.makeText(getApplicationContext(),"Cannot find any information",Toast.LENGTH_LONG);
+                toast.show();
+            }
         };
     public void imageProcess()
         {
