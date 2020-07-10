@@ -7,8 +7,8 @@ import com.google.mlkit.vision.text.Text;
 import java.util.List;
 
 public class KTPFields {
-    String[] infoFields = new String[6];
-    boolean[] infoBools = new boolean[6];
+    String[] infoFields = new String[9];
+    boolean[] infoBools = new boolean[9];
     /*
     Nama = 0
     NIK = 1
@@ -16,6 +16,9 @@ public class KTPFields {
     Kota = 3
     Tanggal Lahir = 4
     Tempat Lahir = 5
+    Status kawin = 6
+    Kewarganegaraan  = 7
+    Kecamatan = 9
      */
     StringUtil checks = new StringUtil();
             public void inputFields(List<String> line)
@@ -49,6 +52,24 @@ public class KTPFields {
                                     insertData(4,toCheck.substring(toCheck.length()-10));
                                     String mod = toCheck.substring(checks.nthLastIndex(2," ",toCheck),checks.nthLastIndex(1," ",toCheck));
                                     insertData(5, checks.rmnonAlphaNum(mod));
+                                    continue;
+                                }
+                            if(toCheck.contains("Status") && !infoBools[6])
+                                {
+                                    insertData(6, toCheck.substring(toCheck.length() - 11).trim());
+                                    continue;
+                                }
+                            if(toCheck.contains("Kewarg") && !infoBools[7])
+                                {
+                                    insertData(7,toCheck.substring(toCheck.indexOf(" ",0)).trim());
+                                    continue;
+                                }
+                            if(toCheck.contains("Kecam")&& !infoBools[8])
+                                {
+                                    if(toCheck.indexOf(" ")==-1)
+                                        insertData(8, toCheck);
+                                    else
+                                        insertData(8,toCheck.substring(toCheck.indexOf(" ")).trim());
                                     continue;
                                 }
                         }

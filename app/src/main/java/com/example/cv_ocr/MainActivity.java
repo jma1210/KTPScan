@@ -317,6 +317,8 @@ public class MainActivity extends AppCompatActivity {
             Size dsize = new Size(actWidth,actHeight);
             Imgproc.warpPerspective(src,dst,warpMat,dsize,Imgproc.INTER_LINEAR,Core.BORDER_CONSTANT);
             Core.normalize(dst,dst,0,255,Core.NORM_MINMAX,CvType.CV_8UC3);
+            Imgproc.cvtColor(dst,dst,Imgproc.COLOR_BGR2GRAY);
+
         }
 
     private BaseLoaderCallback mLoaderCallback = new BaseLoaderCallback(this) {
