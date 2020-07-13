@@ -6,6 +6,8 @@ import android.util.Log;
 /**
  * Helper class to store information gathered from the OCR process.
  * Also holds the filters for most fields
+ * This class is replaced with a new instance every time charRecognition is invoked
+ * A possible way to change this filter class is to instead use relative locations to represent each text area, to more accurately extract information from the text.
  */
 import java.util.List;
 
@@ -31,7 +33,7 @@ public class KTPFields {
                     for(int i = 0 ; i < line.size() ; ++i)
                         {
                             String toCheck = line.get(i).trim();
-                            if(!infoBools[0] && infoBools[1]&&infoBools[2]&&infoBools[3]&&!checks.containSymbol(toCheck)&&!toCheck.contains("Nama"))
+                            if(!infoBools[0] && infoBools[1] && infoBools[2] && !checks.containSymbol(toCheck)) //Name filtering is still problematic ( Try checking content? )
                                 {
                                     insertData(0,toCheck);
                                     continue;

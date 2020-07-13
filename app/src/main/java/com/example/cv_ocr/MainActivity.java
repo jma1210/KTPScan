@@ -163,6 +163,7 @@ public class MainActivity extends AppCompatActivity {
                     for(int j = 0 ; j < lines.size() ; ++j)
                         {
                             sumLines.add(lines.get(j).getText());
+                            Log.i("Location "+String.valueOf(i)+","+String.valueOf(j),String.valueOf(lines.get(j).getCornerPoints()[0]));
                             Log.i("Line "+String.valueOf(i)+","+String.valueOf(j),lines.get(j).getText());
                         }
                 }
