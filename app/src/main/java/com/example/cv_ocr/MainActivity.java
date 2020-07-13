@@ -45,6 +45,16 @@ import org.opencv.imgproc.Moments;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * KTP scanner app designed for use with indonesian identity cards ( hence, KTP )
+ * When importing this app for use in other modules or as a library, it is important to note that you must first load OPENCV library first.
+ * This is done through BaseloaderCallback and OnResume -> If this is not done, then the OpenCV library may not be loaded and when CV functions are called, it will throw exception
+ *
+ * 3 Main functions and several helper functions are in this class
+ * 1. Open gallery -> First button, choose image from gallery and displays it in imageView
+ * 2. ImageProcess -> Second button, does perspective transform and blur detection on the picture selected in imageView. THe image's contrast is then increased to better help OCR model detect text.
+ * 3. charRecognition -> Third button, does OCR using Google's ML Kit Vision ( Text Recognition )
+ */
 public class MainActivity extends AppCompatActivity {
     private boolean isOCVSetUp = false;
     public static final String TAG = "DEBUG";

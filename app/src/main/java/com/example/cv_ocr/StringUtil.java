@@ -1,6 +1,7 @@
 package com.example.cv_ocr;
-/*
-Helper class for string functions.
+
+/**
+ * Helper class for string functions and indexing.
  */
 public class StringUtil {
     public boolean checkIfCaps(String check)
@@ -38,4 +39,14 @@ public class StringUtil {
             return toClean.replaceAll("[^a-zA-Z0-9]", "");
         }
 
+    public int indexOfNum(String check, int numOccurence)
+        {
+            int occurence = 0;
+            for(int i = 0 ; i < check.length() ; ++i)
+                {
+                    if(check.codePointAt(i)>=48 && check.codePointAt(i)<=57)occurence++;
+                    if(occurence==numOccurence)return i;
+                }
+            return 0;
+        }
 }

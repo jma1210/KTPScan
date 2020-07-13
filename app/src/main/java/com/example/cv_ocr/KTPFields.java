@@ -2,8 +2,11 @@ package com.example.cv_ocr;
 
 import android.util.Log;
 
-import com.google.mlkit.vision.text.Text;
 
+/**
+ * Helper class to store information gathered from the OCR process.
+ * Also holds the filters for most fields
+ */
 import java.util.List;
 
 public class KTPFields {
@@ -50,8 +53,8 @@ public class KTPFields {
                                 }
                             if(toCheck.contains("-") && !infoBools[4])
                                 {
-                                    insertData(4,toCheck.substring(toCheck.length()-10));
-                                    String mod = toCheck.substring(0,toCheck.length()-10);
+                                    insertData(4,toCheck.substring(checks.indexOfNum(toCheck,1)));
+                                    String mod = toCheck.substring(0,checks.indexOfNum(toCheck,1));
                                     insertData(5, checks.rmnonAlphaNum(mod.substring(mod.indexOf("r")+1)));
                                     continue;
                                 }
