@@ -60,9 +60,10 @@ public class MainActivity extends AppCompatActivity {
     public static final String TAG = "DEBUG";
     private static final int PICK_IMAGE = 100;
     KTPFields ktp;
+    LocFields loc;
     Button b1, b2, b3;
     ImageView iv;
-    TextView tv;
+    TextView tv,tv2;
     Uri imguri;
     Bitmap forOcr;
 
@@ -91,6 +92,7 @@ public class MainActivity extends AppCompatActivity {
         b3 = (Button) findViewById(R.id.button9);
         iv = (ImageView)findViewById(R.id.imageView);
         tv = (TextView)findViewById(R.id.textView);
+        tv2 = (TextView)findViewById(R.id.textView2);
         b1.setOnClickListener(new View.OnClickListener()
             {
                 @Override
@@ -119,6 +121,7 @@ public class MainActivity extends AppCompatActivity {
     public void charRecognition()
         {
             ktp = new KTPFields();
+            loc = new LocFields();
             if(forOcr == null)
             {
                 Toast toast = Toast.makeText(getApplicationContext(),"No picture available for OCR", Toast.LENGTH_LONG);
@@ -136,6 +139,7 @@ public class MainActivity extends AppCompatActivity {
                                     public void onSuccess(Text text) {
                                         processText(text);
                                         tv.setText(ktp.toPrint);
+                                        loc.debugPrint();
                                     }
                                 })
                                 .addOnFailureListener(new OnFailureListener() {
@@ -151,6 +155,7 @@ public class MainActivity extends AppCompatActivity {
         {
             List<Text.TextBlock> blocks = text.getTextBlocks();
             List<String> sumLines = new ArrayList<String>();
+            List<Text.Line> allLines = new ArrayList<Text.Line>();
             if(blocks.size() == 0)
                 {
                     Toast toast = Toast.makeText(getApplicationContext(),"No text available for OCR", Toast.LENGTH_LONG);
@@ -166,8 +171,10 @@ public class MainActivity extends AppCompatActivity {
                             Log.i("Location "+String.valueOf(i)+","+String.valueOf(j),String.valueOf(lines.get(j).getCornerPoints()[0]));
                             Log.i("Line "+String.valueOf(i)+","+String.valueOf(j),lines.get(j).getText());
                         }
+                    allLines.addAll(lines);
                 }
             if(!sumLines.isEmpty()){ktp.inputFields(sumLines);}
+            if(!allLines.isEmpty()){loc.init(allLines);}
             if(!ktp.toPrint.isEmpty())
             {Toast toast = Toast.makeText(getApplicationContext(),"Finished doing OCR", Toast.LENGTH_LONG);
             toast.show();}
