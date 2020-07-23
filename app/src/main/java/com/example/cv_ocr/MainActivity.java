@@ -45,7 +45,7 @@ import org.opencv.imgproc.Moments;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
+/*
  * KTP scanner app designed for use with indonesian identity cards ( hence, KTP )
  * When importing this app for use in other modules or as a library, it is important to note that you must first load OPENCV library first.
  * This is done through BaseloaderCallback and OnResume -> If this is not done, then the OpenCV library may not be loaded and when CV functions are called, it will throw exception
@@ -55,6 +55,7 @@ import java.util.List;
  * 2. ImageProcess -> Second button, does perspective transform and blur detection on the picture selected in imageView. THe image's contrast is then increased to better help OCR model detect text.
  * 3. charRecognition -> Third button, does OCR using Google's ML Kit Vision ( Text Recognition )
  */
+
 public class MainActivity extends AppCompatActivity {
     private boolean isOCVSetUp = false;
     public static final String TAG = "DEBUG";
@@ -66,12 +67,16 @@ public class MainActivity extends AppCompatActivity {
     TextView tv,tv2;
     Uri imguri;
     Bitmap forOcr;
+/*
+openGallery() - opens the gallery and chooses an image, upon completion, sets the image URI as the chosen image
+*/
 
     private void openGallery() {
-        tv.setText("");
+        tv2.setText("");
         Intent gallery = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.INTERNAL_CONTENT_URI);
         startActivityForResult(gallery, PICK_IMAGE);
     }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data)
         {
@@ -82,7 +87,9 @@ public class MainActivity extends AppCompatActivity {
 //                Log.i("Address (URI)",String.valueOf(imageuri));
             }
         }
-
+/*
+ * On create sets up all button ids for further use
+ */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -118,6 +125,11 @@ public class MainActivity extends AppCompatActivity {
                     }
             });
     };
+    /*
+     * void charRecognition
+     * Assigns new members for KTPFields and LocFields, to reset the data inside.
+     * On button press, it runs the MLKit Vision Text Recognizer, and executes the processText function
+     */
     public void charRecognition()
         {
             ktp = new KTPFields();
@@ -138,8 +150,8 @@ public class MainActivity extends AppCompatActivity {
                                     @Override
                                     public void onSuccess(Text text) {
                                         processText(text);
-                                        tv.setText(ktp.toPrint);
-                                        loc.debugPrint();
+//                                        tv.setText(ktp.toPrint);
+                                        tv2.setText(loc.toPrint);
                                     }
                                 })
                                 .addOnFailureListener(new OnFailureListener() {
@@ -150,7 +162,11 @@ public class MainActivity extends AppCompatActivity {
                                 });
             }
         };
-
+    /*
+     * processText(Text text)
+     * -Text text class for ML Kit
+     * Helper function to extract text data from Text Recognizer into String objects, which are then filtered in each class.
+     */
     private void processText(Text text)
         {
             List<Text.TextBlock> blocks = text.getTextBlocks();
@@ -183,9 +199,14 @@ public class MainActivity extends AppCompatActivity {
                 toast.show();
             }
         };
+        /*
+         * imageProcess()
+         * Takes input image from the uri given, and puts it into a Matrix object
+         * Does basic image manipulation to get the transformed ID card.
+         */
     public void imageProcess()
         {
-            tv.setText("");
+            tv2.setText("");
             Mat org = new Mat();
             if(imguri == null)
                 {
@@ -215,7 +236,7 @@ public class MainActivity extends AppCompatActivity {
             Mat dstImage = new Mat();
             Mat hsvFrame = new Mat(src.cols(),src.rows(), CvType.CV_8U);
             Mat blueMask = new Mat(src.cols(),src.rows(),CvType.CV_8UC1);
-
+            //Change colorspace of image from BGR to HSV for easier differentiation
             Imgproc.cvtColor(src,hsvFrame,Imgproc.COLOR_BGR2HSV);
             Scalar lowBlue = new Scalar(0,20,100);
             Scalar highBlue = new Scalar(45,255,255);
@@ -246,13 +267,27 @@ public class MainActivity extends AppCompatActivity {
             }
 
         };
-
+        
+    /*
+     * Bitmap rotate(Bitmap source, float angle)
+     * Params
+     * - Bitmap source - source bitmap that is to be rotated
+     * - Float angle - the degree with which the bitmap is to be rotated by
+     * Takes a bitmap and returns a rotated bitmap
+     */
     private Bitmap rotate(Bitmap source,float angle)
     {
         Matrix mat = new Matrix();
         mat.postRotate(angle);
         return Bitmap.createBitmap(source, 0, 0, source.getWidth(), source.getHeight(), mat, true);
     };
+    /*
+     * getBlur(Mat src)
+     * Params
+     * - Mat src - matrix from which the blur index is calculated
+     * Calculates an arbitrary focus using the Variance of the Laplacian operator
+     * Returns a boolean value of whether the index calculated is higher or lower than the threshold
+     */
     private boolean getBlur(Mat src)
         {
             double score = 0.0;
@@ -267,7 +302,14 @@ public class MainActivity extends AppCompatActivity {
             Log.i("Score",String.valueOf(score));
             return score<500;
         };
-
+    /*
+    * void perspTransform(Mat src, Mat dst, Mat mask, double ratio)
+    * Params
+    * Mat src - matrix of original picture
+    * Mat dst - destination of the matrix ( it will hold the ID card )
+    * Mat mask - matrix containing the mask of where the id card should be ( blue color )
+    * Double ratio - ratio of the resizing, since we are using the original image to crop the ID card ( for better resolution ), we need to scale the points gotten by the resizing ratio
+    */
     private void perspTransform(Mat src, Mat dst, Mat mask, double ratio)
         {
             Imgproc.blur(mask,mask,new Size(3,3));
@@ -348,7 +390,9 @@ public class MainActivity extends AppCompatActivity {
             Core.normalize(dst,dst,0,350,Core.NORM_MINMAX,CvType.CV_8UC3);
 
         }
-
+    /*
+    * Checks to see if the OpenCV library has been successfully loaded. If it isn't, and a call to the OpenCV library is made, it will cause segfault / crash
+    */
     private BaseLoaderCallback mLoaderCallback = new BaseLoaderCallback(this) {
         @RequiresApi(api = Build.VERSION_CODES.N)
         @Override

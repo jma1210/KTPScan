@@ -3,11 +3,12 @@ package com.example.cv_ocr;
 import android.util.Log;
 
 
-/**
+/*
  * Helper class to store information gathered from the OCR process.
  * Also holds the filters for most fields
  * This class is replaced with a new instance every time charRecognition is invoked
  * A possible way to change this filter class is to instead use relative locations to represent each text area, to more accurately extract information from the text.
+ * Relatively inaccurate, since the string itself may not contain perfectly what is being read. ( NIK gak selalu semuanya angka, karena OCR nya bisa salah baca)
  */
 import java.util.List;
 
@@ -27,6 +28,11 @@ public class KTPFields {
     Kecamatan = 9
      */
     StringUtil checks = new StringUtil();
+        /*
+        * inputFields (List<String> line)
+        * inserts the text based on content in the list of strings
+        * The if statements act as filters
+        */
             public void inputFields(List<String> line)
                 {
                     Log.i("Masuk sini","");

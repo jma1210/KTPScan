@@ -1,6 +1,6 @@
 package com.example.cv_ocr;
 
-/**
+/*
  * Helper class for string functions and indexing.
  */
 public class StringUtil {

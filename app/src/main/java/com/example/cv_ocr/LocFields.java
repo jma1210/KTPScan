@@ -12,32 +12,40 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-/**
+/*
  * Trying out location based filtering
- * Members are :
+ * Members :
  * 1. Lines - ArrayList of lines object gotten from ML OCR process
  * 2. InfoFields 2D ArrayList of String type object, meant to simulate placement of KTP information
  */
 public class LocFields {
     List<Text.Line> lines;
-    List<List<Text.Line>> InfoFields = new ArrayList<List<Text.Line>>();;
-    final int DELTA = 25;
+    List<List<Text.Line>> InfoFields;
+    final int DELTA = 30;
     StringUtil checks;
-    String provinsi, kota, NIK, nama, ttgl, kelamin, alamat, agama, status ,perkawinan, pekerjaan, kewarganegaraan;
+    String provinsi, kota, NIK, nama, ttgl, kelamin, alamat, agama ,perkawinan, pekerjaan, kewarganegaraan,toPrint;
+    /*
+    * Driver function to input all the fields.
+    */
     public void init(List<Text.Line> lines)
         {
+            InfoFields = new ArrayList<List<Text.Line>>();;
             this.lines = lines;
             this.sortLines();
+            this.inputFields();
+            this.debugPrint();
+            toPrint = provinsi+'\n'+kota+'\n'+NIK+'\n'+nama+'\n'+ttgl+'\n'+kelamin+'\n'+alamat;
+//                    +'\n'+agama+'\n'+perkawinan+'\n'+pekerjaan+'\n'+kewarganegaraan;
         }
     public void debugPrint()
         {
-//            Log.i("First debug","This is the first debug");
-//            for(int i = 0 ; i < lines.size() ; ++i)
-//                {
-//                    String print = "";
-//                    print+=lines.get(i).getText()+" , "+lines.get(i).getCornerPoints()[0].y;
-//                    Log.i("Line number "+String.valueOf(i),print);
-//                }
+            Log.i("First debug","This is the first debug");
+            for(int i = 0 ; i < lines.size() ; ++i)
+                {
+                    String print = "";
+                    print+=lines.get(i).getText()+" , "+lines.get(i).getCornerPoints()[0].y;
+                    Log.i("Line number "+String.valueOf(i),print);
+                }
 
             for(int i = 0 ; i < InfoFields.size() ; ++i)
                 {
@@ -50,11 +58,17 @@ public class LocFields {
                     Log.i("Line "+String.valueOf(i),print);
                 }
         }
+        /*
+        * Hardcoding the string inputs.
+        * Because the location of info in KTP ( Provinsi, NIK, etc) do not change relative to each other this is possible
+        * Susceptible to unread lines
+        */
     public void inputFields()
         {
             //Input fields based on location
-            provinsi        = InfoFields.get(0).get(0).getText().substring(9).trim();
-            kota            = InfoFields.get(1).get(0).getText().substring(5).trim();
+            //Selecting is still problematic, this is pretty much hardcoded
+            provinsi        = InfoFields.get(0).get(InfoFields.get(0).size()-1).getText().substring(9).trim();
+            kota            = InfoFields.get(1).get(InfoFields.get(1).size()-1).getText().substring(5).trim();
             NIK             = InfoFields.get(2).get(InfoFields.get(2).size()-1).getText().trim();
             nama            = InfoFields.get(3).get(InfoFields.get(3).size()-1).getText().trim();
             ttgl            = InfoFields.get(4).get(InfoFields.get(4).size()-1).getText().trim();
@@ -64,13 +78,16 @@ public class LocFields {
                               InfoFields.get(8).get(InfoFields.get(8).size()-1).getText().trim()+" "+
                               InfoFields.get(9).get(InfoFields.get(9).size()-1).getText().trim()+" "+
                               InfoFields.get(10).get(InfoFields.get(10).size()-1).getText().trim();
-            agama           = InfoFields.get(11).get(InfoFields.get(11).size()-1).getText().trim();
-            perkawinan      = InfoFields.get(12).get(InfoFields.get(12).size()-1).getText().trim();
-            pekerjaan       = InfoFields.get(13).get(InfoFields.get(13).size()-1).getText().trim();
-            kewarganegaraan = InfoFields.get(13).get(InfoFields.get(14).size()-1).getText().trim();
+//            agama           = InfoFields.get(11).get(InfoFields.get(11).size()-1).getText().trim();
+//            perkawinan      = InfoFields.get(12).get(0).getText().trim();
+//            pekerjaan       = InfoFields.get(13).get(1).getText().trim();
+//            kewarganegaraan = InfoFields.get(14).get(0).getText().trim();
         }
 
     private void sortLines()
+    /*
+    * Sort the lines based on their location, with their vertical position being of higher power than their horizontal position
+    */
         {
             Collections.sort(lines,new SortByY());
             List<Text.Line> currRow = new ArrayList<Text.Line>();
@@ -78,6 +95,12 @@ public class LocFields {
             for(int i = 0 ; i < lines.size() ; ++i)
                 {
                     Text.Line currLine = lines.get(i);
+                    if(currY == 0)
+                        {
+                            currRow.add(currLine);
+                            currY = currLine.getCornerPoints()[0].y;
+                            continue;
+                        }
                     if(Math.abs(currY-currLine.getCornerPoints()[0].y)>DELTA)
                         {
                             Collections.sort(currRow,new SortByX());
